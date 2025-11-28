@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebGPU Physics - Particle Carpet</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #1a1a2e; color: #eee; font-family: system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px; }
+    header { display: flex; gap: 12px; font-size: 14px; color: #a0a3c2; }
+    header a { color: #9ad1ff; text-decoration: none; }
+    canvas { border: 1px solid #333; border-radius: 4px; }
+    #info { font-size: 14px; color: #888; }
+    #error { color: #ff6b6b; max-width: 640px; text-align: center; padding: 10px; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.19"></script>
+</head>
+<body>
+  <header>
+    <a href="./index.html">Many Boxes</a>
+    <span>•</span>
+    <a href="./box.html">Single Box</a>
+    <span>•</span>
+    <a href="./sphere.html">Sphere Interaction</a>
+    <span>•</span>
+    <span>Particle Carpet</span>
+  </header>
+  <canvas id="canvas" width="900" height="600"></canvas>
+  <div id="info">Particles: <span id="particleCount">0</span> | FPS: <span id="fps">0</span></div>
+  <div id="error"></div>
+  <script type="module" src="./carpet.js"></script>
+</body>
+</html>

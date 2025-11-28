@@ -1,27 +1,19 @@
 {
   "name": "webgpu-physics",
   "version": "1.0.0",
-  "description": "High-performance GPU-accelerated physics simulation using WebGPU compute shaders",
+  "description": "High-performance GPU-accelerated physics simulation using WebGPU compute shaders (plain JavaScript)",
   "type": "module",
   "main": "dist/webgpu-physics.js",
   "module": "dist/webgpu-physics.js",
-  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/webgpu-physics.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/webgpu-physics.js"
     }
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "test:e2e": "vitest run --config vitest.e2e.config.ts",
-    "lint": "eslint src --ext .ts",
-    "typecheck": "tsc --noEmit"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "keywords": [
     "webgpu",
@@ -34,12 +26,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.10.0",
-    "@webgpu/types": "^0.1.40",
-    "puppeteer": "^21.6.0",
-    "typescript": "^5.3.2",
-    "vite": "^5.0.4",
-    "vitest": "^1.0.4"
+    "vite": "^5.0.4"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -1,9 +1,8 @@
 var A = Object.defineProperty;
 var S = (u, e, t) => e in u ? A(u, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : u[e] = t;
-var d = (u, e, t) => S(u, typeof e != "symbol" ? e + "" : e, t);
+var l = (u, e, t) => S(u, typeof e != "symbol" ? e + "" : e, t);
 class h {
   constructor(e = 0, t = 0, i = 0) {
-    d(this, "data");
     this.data = new Float32Array([e, t, i]);
   }
   get x() {
@@ -59,8 +58,8 @@ class h {
     const e = this.length();
     return e > 0 && this.scale(1 / e), this;
   }
-  static cross(e, t, i) {
-    return i = i || new h(), i.data[0] = e.y * t.z - e.z * t.y, i.data[1] = e.z * t.x - e.x * t.z, i.data[2] = e.x * t.y - e.y * t.x, i;
+  static cross(e, t, i = new h()) {
+    return i.data[0] = e.y * t.z - e.z * t.y, i.data[1] = e.z * t.x - e.x * t.z, i.data[2] = e.x * t.y - e.y * t.x, i;
   }
   static dot(e, t) {
     return e.x * t.x + e.y * t.y + e.z * t.z;
@@ -68,7 +67,6 @@ class h {
 }
 class G {
   constructor(e = 0, t = 0, i = 0, n = 0) {
-    d(this, "data");
     this.data = new Float32Array([e, t, i, n]);
   }
   get x() {
@@ -107,7 +105,6 @@ class G {
 }
 class w {
   constructor(e = 0, t = 0, i = 0, n = 1) {
-    d(this, "data");
     this.data = new Float32Array([e, t, i, n]);
   }
   get x() {
@@ -157,91 +154,54 @@ class w {
     }
     return this;
   }
-  /**
-   * Integrate quaternion with angular velocity
-   * Matches the original GLSL quat_integrate function
-   */
   integrate(e, t) {
     const i = t * 0.5, n = e.x, a = e.y, r = e.z;
     return this.data[0] += i * (n * this.w + a * this.z - r * this.y), this.data[1] += i * (a * this.w + r * this.x - n * this.z), this.data[2] += i * (r * this.w + n * this.y - a * this.x), this.data[3] += i * (-n * this.x - a * this.y - r * this.z), this.normalize();
   }
-  /**
-   * Apply quaternion rotation to a vector
-   * Matches the original GLSL vec3_applyQuat function
-   */
-  applyToVec3(e, t) {
-    t = t || new h();
-    const i = e.x, n = e.y, a = e.z, r = this.x, o = this.y, s = this.z, l = this.w, p = l * i + o * a - s * n, g = l * n + s * i - r * a, f = l * a + r * n - o * i, c = -r * i - o * n - s * a;
-    return t.data[0] = p * l + c * -r + g * -s - f * -o, t.data[1] = g * l + c * -o + f * -r - p * -s, t.data[2] = f * l + c * -s + p * -o - g * -r, t;
+  applyToVec3(e, t = new h()) {
+    const i = e.x, n = e.y, a = e.z, r = this.x, o = this.y, s = this.z, d = this.w, p = d * i + o * a - s * n, g = d * n + s * i - r * a, b = d * a + r * n - o * i, c = -r * i - o * n - s * a;
+    return t.data[0] = p * d + c * -r + g * -s - b * -o, t.data[1] = g * d + c * -o + b * -r - p * -s, t.data[2] = b * d + c * -s + p * -o - g * -r, t;
   }
-  /**
-   * Set quaternion from axis-angle representation
-   */
   setFromAxisAngle(e, t) {
     const i = t * 0.5, n = Math.sin(i);
     return this.data[0] = e.x * n, this.data[1] = e.y * n, this.data[2] = e.z * n, this.data[3] = Math.cos(i), this;
   }
-  /**
-   * Multiply this quaternion by another
-   */
   multiply(e) {
-    const t = this.x, i = this.y, n = this.z, a = this.w, r = e.x, o = e.y, s = e.z, l = e.w;
-    return this.data[0] = t * l + a * r + i * s - n * o, this.data[1] = i * l + a * o + n * r - t * s, this.data[2] = n * l + a * s + t * o - i * r, this.data[3] = a * l - t * r - i * o - n * s, this;
+    const t = this.x, i = this.y, n = this.z, a = this.w, r = e.x, o = e.y, s = e.z, d = e.w;
+    return this.data[0] = t * d + a * r + i * s - n * o, this.data[1] = i * d + a * o + n * r - t * s, this.data[2] = n * d + a * s + t * o - i * r, this.data[3] = a * d - t * r - i * o - n * s, this;
   }
-  /**
-   * Spherical linear interpolation
-   */
-  static slerp(e, t, i, n) {
-    n = n || new w();
-    let a = e.x * t.x + e.y * t.y + e.z * t.z + e.w * t.w, r = t.x, o = t.y, s = t.z, l = t.w;
-    if (a < 0 && (r = -r, o = -o, s = -s, l = -l, a = -a), a > 0.9995)
-      return n.data[0] = e.x + i * (r - e.x), n.data[1] = e.y + i * (o - e.y), n.data[2] = e.z + i * (s - e.z), n.data[3] = e.w + i * (l - e.w), n.normalize();
-    const p = Math.acos(a), g = p * i, f = Math.sin(g), c = Math.sin(p), v = Math.cos(g) - a * f / c, m = f / c;
-    return n.data[0] = e.x * v + r * m, n.data[1] = e.y * v + o * m, n.data[2] = e.z * v + s * m, n.data[3] = e.w * v + l * m, n;
+  static slerp(e, t, i, n = new w()) {
+    let a = e.x * t.x + e.y * t.y + e.z * t.z + e.w * t.w, r = t.x, o = t.y, s = t.z, d = t.w;
+    if (a < 0 && (r = -r, o = -o, s = -s, d = -d, a = -a), a > 0.9995)
+      return n.data[0] = e.x + i * (r - e.x), n.data[1] = e.y + i * (o - e.y), n.data[2] = e.z + i * (s - e.z), n.data[3] = e.w + i * (d - e.w), n.normalize();
+    const p = Math.acos(a), g = p * i, b = Math.sin(g), c = Math.sin(p), v = Math.cos(g) - a * b / c, m = b / c;
+    return n.data[0] = e.x * v + r * m, n.data[1] = e.y * v + o * m, n.data[2] = e.z * v + s * m, n.data[3] = e.w * v + d * m, n;
   }
 }
 class R {
   constructor() {
-    d(this, "data");
     this.data = new Float32Array(9), this.identity();
   }
   identity() {
     return this.data.fill(0), this.data[0] = 1, this.data[4] = 1, this.data[8] = 1, this;
   }
-  /**
-   * Create rotation matrix from quaternion
-   * Matches the original GLSL quat2mat function
-   */
   fromQuat(e) {
-    const t = e.x, i = e.y, n = e.z, a = e.w, r = t + t, o = i + i, s = n + n, l = t * r, p = t * o, g = t * s, f = i * o, c = i * s, v = n * s, m = a * r, I = a * o, B = a * s;
-    return this.data[0] = 1 - (f + v), this.data[1] = p + B, this.data[2] = g - I, this.data[3] = p - B, this.data[4] = 1 - (l + v), this.data[5] = c + m, this.data[6] = g + I, this.data[7] = c - m, this.data[8] = 1 - (l + f), this;
+    const t = e.x, i = e.y, n = e.z, a = e.w, r = t + t, o = i + i, s = n + n, d = t * r, p = t * o, g = t * s, b = i * o, c = i * s, v = n * s, m = a * r, I = a * o, B = a * s;
+    return this.data[0] = 1 - (b + v), this.data[1] = p + B, this.data[2] = g - I, this.data[3] = p - B, this.data[4] = 1 - (d + v), this.data[5] = c + m, this.data[6] = g + I, this.data[7] = c - m, this.data[8] = 1 - (d + b), this;
   }
-  /**
-   * Transpose in place
-   */
   transpose() {
     const e = this.data;
     let t;
     return t = e[1], e[1] = e[3], e[3] = t, t = e[2], e[2] = e[6], e[6] = t, t = e[5], e[5] = e[7], e[7] = t, this;
   }
-  /**
-   * Multiply two matrices: this = this * b
-   */
   multiply(e) {
     const t = this.data, i = [...t], n = e.data;
     return t[0] = i[0] * n[0] + i[3] * n[1] + i[6] * n[2], t[1] = i[1] * n[0] + i[4] * n[1] + i[7] * n[2], t[2] = i[2] * n[0] + i[5] * n[1] + i[8] * n[2], t[3] = i[0] * n[3] + i[3] * n[4] + i[6] * n[5], t[4] = i[1] * n[3] + i[4] * n[4] + i[7] * n[5], t[5] = i[2] * n[3] + i[5] * n[4] + i[8] * n[5], t[6] = i[0] * n[6] + i[3] * n[7] + i[6] * n[8], t[7] = i[1] * n[6] + i[4] * n[7] + i[7] * n[8], t[8] = i[2] * n[6] + i[5] * n[7] + i[8] * n[8], this;
   }
-  /**
-   * Apply matrix to vector
-   */
-  applyToVec3(e, t) {
-    t = t || new h();
+  applyToVec3(e, t = new h()) {
     const i = this.data, n = e.x, a = e.y, r = e.z;
     return t.data[0] = i[0] * n + i[3] * a + i[6] * r, t.data[1] = i[1] * n + i[4] * a + i[7] * r, t.data[2] = i[2] * n + i[5] * a + i[8] * r, t;
   }
-  /**
-   * Create diagonal matrix from vector
-   */
   setDiagonal(e) {
     return this.data.fill(0), this.data[0] = e.x, this.data[4] = e.y, this.data[8] = e.z, this;
   }
@@ -255,44 +215,42 @@ function T() {
 }
 async function W() {
   if (!T())
-    throw new Error("WebGPU is not supported in this browser. Please use a WebGPU-enabled browser like Chrome 113+ or Edge 113+.");
-  const e = await navigator.gpu.requestAdapter({
-    powerPreference: "high-performance"
-  });
+    throw new Error("WebGPU is not supported in this browser. Use Chrome/Edge 113+ with WebGPU enabled.");
+  const e = await navigator.gpu.requestAdapter({ powerPreference: "high-performance" });
   if (!e)
-    throw new Error("Failed to get WebGPU adapter. Your GPU may not support WebGPU.");
-  const t = e.info;
+    throw new Error("Failed to acquire a WebGPU adapter. Your GPU may not support WebGPU.");
+  const t = e.info || {};
   console.log("WebGPU Adapter:", {
     vendor: t.vendor,
     architecture: t.architecture,
     device: t.device,
     description: t.description
   });
-  const i = [], n = {
-    maxStorageBufferBindingSize: e.limits.maxStorageBufferBindingSize,
-    maxComputeWorkgroupsPerDimension: e.limits.maxComputeWorkgroupsPerDimension,
-    maxComputeInvocationsPerWorkgroup: e.limits.maxComputeInvocationsPerWorkgroup,
-    maxComputeWorkgroupSizeX: e.limits.maxComputeWorkgroupSizeX,
-    maxComputeWorkgroupSizeY: e.limits.maxComputeWorkgroupSizeY,
-    maxComputeWorkgroupSizeZ: e.limits.maxComputeWorkgroupSizeZ
-  };
-  e.features.has("timestamp-query") && i.push("timestamp-query");
-  const a = await e.requestDevice({
+  const i = [];
+  e.features && e.features.has && e.features.has("timestamp-query") && i.push("timestamp-query");
+  const n = await e.requestDevice({
     requiredFeatures: i,
-    requiredLimits: n
+    requiredLimits: {
+      maxStorageBufferBindingSize: e.limits.maxStorageBufferBindingSize,
+      maxComputeWorkgroupsPerDimension: e.limits.maxComputeWorkgroupsPerDimension,
+      maxComputeInvocationsPerWorkgroup: e.limits.maxComputeInvocationsPerWorkgroup,
+      maxComputeWorkgroupSizeX: e.limits.maxComputeWorkgroupSizeX,
+      maxComputeWorkgroupSizeY: e.limits.maxComputeWorkgroupSizeY,
+      maxComputeWorkgroupSizeZ: e.limits.maxComputeWorkgroupSizeZ
+    }
   });
-  return a.lost.then((r) => {
-    console.error("WebGPU device lost:", r.message), r.reason !== "destroyed" && console.error("Device loss reason:", r.reason);
-  }), a.onuncapturederror = (r) => {
-    console.error("WebGPU uncaptured error:", r.error);
+  return n.lost.then((a) => {
+    console.error("WebGPU device lost:", a.message), a.reason !== "destroyed" && console.error("Device loss reason:", a.reason);
+  }), n.onuncapturederror = (a) => {
+    console.error("WebGPU uncaptured error:", a.error);
   }, {
     adapter: e,
-    device: a,
-    features: a.features,
-    limits: a.limits
+    device: n,
+    features: n.features,
+    limits: n.limits
   };
 }
-function b(u, e, t) {
+function f(u, e, t) {
   return u.createShaderModule({
     label: t || "shader",
     code: e
@@ -1161,46 +1119,46 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 class N {
   constructor(e = {}) {
     // WebGPU context
-    d(this, "ctx");
-    d(this, "device");
+    l(this, "ctx");
+    l(this, "device");
     // Buffers
-    d(this, "buffers");
-    d(this, "pipelines");
-    d(this, "layouts");
-    d(this, "bindGroups", /* @__PURE__ */ new Map());
+    l(this, "buffers");
+    l(this, "pipelines");
+    l(this, "layouts");
+    l(this, "bindGroups", /* @__PURE__ */ new Map());
     // Simulation state
-    d(this, "_bodyCount", 0);
-    d(this, "_particleCount", 0);
-    d(this, "maxBodies");
-    d(this, "maxParticles");
+    l(this, "_bodyCount", 0);
+    l(this, "_particleCount", 0);
+    l(this, "maxBodies");
+    l(this, "maxParticles");
     // Simulation parameters
-    d(this, "params");
-    d(this, "grid");
+    l(this, "params");
+    l(this, "grid");
     // Timing
-    d(this, "time", 0);
-    d(this, "fixedTime", 0);
-    d(this, "accumulator", 0);
-    d(this, "maxSubSteps");
-    d(this, "_interpolationValue", 0);
+    l(this, "time", 0);
+    l(this, "fixedTime", 0);
+    l(this, "accumulator", 0);
+    l(this, "maxSubSteps");
+    l(this, "_interpolationValue", 0);
     // Double-buffer state (which buffer is current)
-    d(this, "bufferIndex", 0);
+    l(this, "bufferIndex", 0);
     // CPU-side data for initialization
-    d(this, "bodyPositions");
-    d(this, "bodyQuaternions");
-    d(this, "bodyMasses");
-    d(this, "particleLocalPositions");
+    l(this, "bodyPositions");
+    l(this, "bodyQuaternions");
+    l(this, "bodyMasses");
+    l(this, "particleLocalPositions");
     // Dirty flags for CPU->GPU sync
-    d(this, "bodyDataDirty", !0);
-    d(this, "particleDataDirty", !0);
-    d(this, "massDirty", !0);
+    l(this, "bodyDataDirty", !0);
+    l(this, "particleDataDirty", !0);
+    l(this, "massDirty", !0);
     // Sphere interaction
-    d(this, "interactionSphere", {
+    l(this, "interactionSphere", {
       position: new h(10, 1, 0),
       radius: 1
     });
     // Initialization promise
-    d(this, "initPromise");
-    d(this, "initialized", !1);
+    l(this, "initPromise");
+    l(this, "initialized", !1);
     var i, n, a;
     this.maxBodies = e.maxBodies || 64, this.maxParticles = e.maxParticles || 256, this.maxSubSteps = e.maxSubSteps || 5, this.params = {
       stiffness: e.stiffness ?? 1700,
@@ -1274,34 +1232,34 @@ class N {
    */
   async createPipelines() {
     const e = this.device, t = (s) => M + `
-` + s, i = (s, l) => ({
+` + s, i = (s, d) => ({
       binding: s,
       visibility: GPUShaderStage.COMPUTE,
-      buffer: { type: l }
-    }), n = (s, l) => e.createBindGroupLayout({ label: s, entries: l }), a = (s, l, p) => e.createComputePipeline({
+      buffer: { type: d }
+    }), n = (s, d) => e.createBindGroupLayout({ label: s, entries: d }), a = (s, d, p) => e.createComputePipeline({
       label: s,
       layout: e.createPipelineLayout({
         label: `${s}-layout`,
         bindGroupLayouts: [p]
       }),
       compute: {
-        module: l,
+        module: d,
         entryPoint: "main"
       }
     }), r = {
-      localToWorld: b(e, t(O), "local-to-world"),
-      localToRelative: b(e, t(k), "local-to-relative"),
-      bodyVelToParticleVel: b(e, t(U), "body-vel-to-particle-vel"),
-      clearGrid: b(e, t(D), "clear-grid"),
-      buildGrid: b(e, t(Q), "build-grid"),
-      updateForce: b(e, t(E), "update-force"),
-      updateTorque: b(e, t(L), "update-torque"),
-      reduceForce: b(e, t(j), "reduce-force"),
-      reduceTorque: b(e, t(Z), "reduce-torque"),
-      updateBodyVelocity: b(e, t(K), "update-body-velocity"),
-      updateBodyAngularVelocity: b(e, t(Y), "update-body-angular-velocity"),
-      updateBodyPosition: b(e, t(X), "update-body-position"),
-      updateBodyQuaternion: b(e, t($), "update-body-quaternion")
+      localToWorld: f(e, t(O), "local-to-world"),
+      localToRelative: f(e, t(k), "local-to-relative"),
+      bodyVelToParticleVel: f(e, t(U), "body-vel-to-particle-vel"),
+      clearGrid: f(e, t(D), "clear-grid"),
+      buildGrid: f(e, t(Q), "build-grid"),
+      updateForce: f(e, t(E), "update-force"),
+      updateTorque: f(e, t(L), "update-torque"),
+      reduceForce: f(e, t(j), "reduce-force"),
+      reduceTorque: f(e, t(Z), "reduce-torque"),
+      updateBodyVelocity: f(e, t(K), "update-body-velocity"),
+      updateBodyAngularVelocity: f(e, t(Y), "update-body-angular-velocity"),
+      updateBodyPosition: f(e, t(X), "update-body-position"),
+      updateBodyQuaternion: f(e, t($), "update-body-quaternion")
     }, o = {
       localToWorld: n("layout/local-to-world", [
         i(0, "uniform"),
@@ -1422,7 +1380,7 @@ class N {
    * Update bind groups after buffer swap
    */
   updateBindGroups() {
-    const e = this.device, t = this.buffers, i = this.layouts, n = this.bufferIndex === 0 ? t.bodyPositionA : t.bodyPositionB, a = this.bufferIndex === 0 ? t.bodyPositionB : t.bodyPositionA, r = this.bufferIndex === 0 ? t.bodyQuaternionA : t.bodyQuaternionB, o = this.bufferIndex === 0 ? t.bodyQuaternionB : t.bodyQuaternionA, s = this.bufferIndex === 0 ? t.bodyVelocityA : t.bodyVelocityB, l = this.bufferIndex === 0 ? t.bodyVelocityB : t.bodyVelocityA, p = this.bufferIndex === 0 ? t.bodyAngularVelocityA : t.bodyAngularVelocityB, g = this.bufferIndex === 0 ? t.bodyAngularVelocityB : t.bodyAngularVelocityA;
+    const e = this.device, t = this.buffers, i = this.layouts, n = this.bufferIndex === 0 ? t.bodyPositionA : t.bodyPositionB, a = this.bufferIndex === 0 ? t.bodyPositionB : t.bodyPositionA, r = this.bufferIndex === 0 ? t.bodyQuaternionA : t.bodyQuaternionB, o = this.bufferIndex === 0 ? t.bodyQuaternionB : t.bodyQuaternionA, s = this.bufferIndex === 0 ? t.bodyVelocityA : t.bodyVelocityB, d = this.bufferIndex === 0 ? t.bodyVelocityB : t.bodyVelocityA, p = this.bufferIndex === 0 ? t.bodyAngularVelocityA : t.bodyAngularVelocityB, g = this.bufferIndex === 0 ? t.bodyAngularVelocityB : t.bodyAngularVelocityA;
     this.bindGroups.set("localToWorld", e.createBindGroup({
       layout: i.localToWorld,
       entries: [
@@ -1513,7 +1471,7 @@ class N {
         { binding: 1, resource: { buffer: s } },
         { binding: 2, resource: { buffer: t.bodyForce } },
         { binding: 3, resource: { buffer: t.bodyMass } },
-        { binding: 4, resource: { buffer: l } }
+        { binding: 4, resource: { buffer: d } }
       ]
     })), this.bindGroups.set("updateBodyAngularVelocity", e.createBindGroup({
       layout: i.updateBodyAngularVelocity,
@@ -1530,7 +1488,7 @@ class N {
       entries: [
         { binding: 0, resource: { buffer: t.params } },
         { binding: 1, resource: { buffer: n } },
-        { binding: 2, resource: { buffer: l } },
+        { binding: 2, resource: { buffer: d } },
         // Use updated velocity
         { binding: 3, resource: { buffer: a } }
       ]
@@ -1569,11 +1527,11 @@ class N {
   /**
    * Add a rigid body to the simulation
    */
-  addBody(e, t, i, n, a, r, o, s, l, p, g) {
+  addBody(e, t, i, n, a, r, o, s, d, p, g) {
     if (this._bodyCount >= this.maxBodies)
       return console.warn(`Cannot add body: maximum (${this.maxBodies}) reached`), -1;
-    const f = this._bodyCount, c = f * 4;
-    return this.bodyPositions[c] = e, this.bodyPositions[c + 1] = t, this.bodyPositions[c + 2] = i, this.bodyPositions[c + 3] = 1, this.bodyQuaternions[c] = n, this.bodyQuaternions[c + 1] = a, this.bodyQuaternions[c + 2] = r, this.bodyQuaternions[c + 3] = o, this.bodyMasses[c] = l > 0 ? 1 / l : 0, this.bodyMasses[c + 1] = p > 0 ? 1 / p : 0, this.bodyMasses[c + 2] = g > 0 ? 1 / g : 0, this.bodyMasses[c + 3] = s > 0 ? 1 / s : 0, this._bodyCount++, this.bodyDataDirty = !0, this.massDirty = !0, f;
+    const b = this._bodyCount, c = b * 4;
+    return this.bodyPositions[c] = e, this.bodyPositions[c + 1] = t, this.bodyPositions[c + 2] = i, this.bodyPositions[c + 3] = 1, this.bodyQuaternions[c] = n, this.bodyQuaternions[c + 1] = a, this.bodyQuaternions[c + 2] = r, this.bodyQuaternions[c + 3] = o, this.bodyMasses[c] = d > 0 ? 1 / d : 0, this.bodyMasses[c + 1] = p > 0 ? 1 / p : 0, this.bodyMasses[c + 2] = g > 0 ? 1 / g : 0, this.bodyMasses[c + 3] = s > 0 ? 1 / s : 0, this._bodyCount++, this.bodyDataDirty = !0, this.massDirty = !0, b;
   }
   /**
    * Add a collision particle to a body
@@ -1666,6 +1624,19 @@ class N {
   }
   get particleCount() {
     return this._particleCount;
+  }
+  /**
+   * Expose GPU buffers for rendering
+   */
+  getParticleWorldPositionBuffer() {
+    return this.buffers.particleWorldPosition;
+  }
+  // Backward/compat alias
+  getParticlePositionBuffer() {
+    return this.getParticleWorldPositionBuffer();
+  }
+  getParamsBuffer() {
+    return this.buffers.params;
   }
   get interpolationValue() {
     return this._interpolationValue;
