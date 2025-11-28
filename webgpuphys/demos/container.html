@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebGPU Physics - Boxes Demo</title>
+  <title>WebGPU Physics - Container Fill</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
-      background: #1a1a2e; 
+      background: #0f1024; 
       display: flex; 
       flex-direction: column;
       align-items: center; 
@@ -25,40 +25,25 @@
       color: #a0a3c2;
       font-size: 14px;
     }
-    header a {
-      color: #9ad1ff;
-      text-decoration: none;
-    }
-    canvas { 
-      border: 1px solid #333;
-      border-radius: 4px;
-    }
-    #info {
-      margin-top: 16px;
-      font-size: 14px;
-      color: #888;
-    }
-    #error {
-      color: #ff6b6b;
-      max-width: 600px;
-      text-align: center;
-      padding: 20px;
-    }
+    header a { color: #9ad1ff; text-decoration: none; }
+    canvas { border: 1px solid #2b2d4a; border-radius: 4px; }
+    #info { font-size: 14px; color: #888; }
+    #error { color: #ff6b6b; max-width: 600px; text-align: center; padding: 20px; }
   </style>
 </head>
 <body>
   <header>
-    <span>WebGPU Physics</span>
+    <a href="./index.html">Many Boxes</a>
     <span>•</span>
     <a href="./box.html">Single Box</a>
     <span>•</span>
     <a href="./sphere.html">Sphere Interaction</a>
     <span>•</span>
-    <a href="./container.html">Container Fill</a>
+    <span>Container Fill</span>
   </header>
   <canvas id="canvas" width="800" height="600"></canvas>
   <div id="info">Bodies: <span id="bodyCount">0</span> | FPS: <span id="fps">0</span></div>
   <div id="error"></div>
-  <script type="module" src="./boxes.ts"></script>
+  <script type="module" src="./container.ts"></script>
 </body>
 </html>
