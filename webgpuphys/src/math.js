@@ -372,3 +372,16 @@ export function calculateBoxInertia(mass, extents) {
     c * (ex * ex + ey * ey)
   );
 }
+
+export function calculateCloudInertia(mass, particles) {
+  // particles is array of [x,y,z]
+  const particleMass = mass / particles.length;
+  let Ixx = 0, Iyy = 0, Izz = 0;
+  for (const p of particles) {
+    const x = p[0], y = p[1], z = p[2];
+    Ixx += particleMass * (y * y + z * z);
+    Iyy += particleMass * (x * x + z * z);
+    Izz += particleMass * (x * x + y * y);
+  }
+  return new Vec3(Ixx, Iyy, Izz);
+}

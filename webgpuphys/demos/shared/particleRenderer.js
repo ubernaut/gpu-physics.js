@@ -1,8 +1,11 @@
+import { createSphereGeometry } from "./geometries.js";
+
 class ParticleRenderer {
   constructor(device) {
     this.device = device;
 
-    const { vertices, indices } = this.createCubeGeometry();
+    // Use sphere geometry (low poly for performance)
+    const { vertices, indices } = createSphereGeometry(1, 8, 6);
     this.vertexBuffer = device.createBuffer({
       size: vertices.byteLength,
       usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
@@ -69,12 +72,12 @@ class ParticleRenderer {
 
       @fragment
       fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-        let lightDir = normalize(vec3(0.4, 1.0, 0.25));
-        let ambient = 0.2;
+        let lightDir = vec3(0.0, 1.0, 0.0); // Straight down
+        let ambient = 0.3;
         let diffuse = max(dot(in.normal, lightDir), 0.0);
         let hue = f32(in.bodyId % 16u) / 16.0;
         let color = hsvToRgb(hue, 0.6, 0.95);
-        let lighting = ambient + diffuse * 0.8;
+        let lighting = ambient + diffuse * 1.0;
         return vec4(color * lighting, 1.0);
       }
     `;
@@ -142,51 +145,6 @@ class ParticleRenderer {
     passEncoder.drawIndexed(this.indexCount, particleCount);
   }
 
-  createCubeGeometry() {
-    const vertices = new Float32Array([
-      // Front face
-      -1, -1,  1,   0,  0,  1,
-       1, -1,  1,   0,  0,  1,
-       1,  1,  1,   0,  0,  1,
-      -1,  1,  1,   0,  0,  1,
-      // Back face
-       1, -1, -1,   0,  0, -1,
-      -1, -1, -1,   0,  0, -1,
-      -1,  1, -1,   0,  0, -1,
-       1,  1, -1,   0,  0, -1,
-      // Top face
-      -1,  1,  1,   0,  1,  0,
-       1,  1,  1,   0,  1,  0,
-       1,  1, -1,   0,  1,  0,
-      -1,  1, -1,   0,  1,  0,
-      // Bottom face
-      -1, -1, -1,   0, -1,  0,
-       1, -1, -1,   0, -1,  0,
-       1, -1,  1,   0, -1,  0,
-      -1, -1,  1,   0, -1,  0,
-      // Right face
-       1, -1,  1,   1,  0,  0,
-       1, -1, -1,   1,  0,  0,
-       1,  1, -1,   1,  0,  0,
-       1,  1,  1,   1,  0,  0,
-      // Left face
-      -1, -1, -1,  -1,  0,  0,
-      -1, -1,  1,  -1,  0,  0,
-      -1,  1,  1,  -1,  0,  0,
-      -1,  1, -1,  -1,  0,  0,
-    ]);
-
-    const indices = new Uint16Array([
-      0, 1, 2, 0, 2, 3,
-      4, 5, 6, 4, 6, 7,
-      8, 9, 10, 8, 10, 11,
-      12, 13, 14, 12, 14, 15,
-      16, 17, 18, 16, 18, 19,
-      20, 21, 22, 20, 22, 23,
-    ]);
-
-    return { vertices, indices };
-  }
 }
 
 export { ParticleRenderer };

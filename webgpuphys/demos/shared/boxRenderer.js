@@ -71,12 +71,12 @@ class BoxRenderer {
 
       @fragment
       fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-        let lightDir = normalize(vec3(0.5, 1.0, 0.3));
-        let ambient = 0.25;
+        let lightDir = vec3(0.0, 1.0, 0.0); // Straight down
+        let ambient = 0.3;
         let diffuse = max(dot(in.normal, lightDir), 0.0);
         let hue = f32(in.instanceId % 12u) / 12.0;
         let color = hsvToRgb(hue, 0.7, 0.9);
-        let lighting = ambient + diffuse * 0.75;
+        let lighting = ambient + diffuse * 1.0;
         return vec4(color * lighting, 1.0);
       }
 
