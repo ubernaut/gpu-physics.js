@@ -5,13 +5,15 @@ class OrbitCamera {
     this.target = opts.target || [0, 0.5, 0];
     this.radius = opts.radius || 14;
     this.minRadius = opts.minRadius || 2;
-    this.maxRadius = opts.maxRadius || 60;
+    this.maxRadius = opts.maxRadius || 200; // Increased
     this.theta = opts.theta || 0; // yaw
     this.phi = opts.phi || Math.PI / 4; // pitch
     this.rotateSpeed = opts.rotateSpeed || 0.005;
     this.zoomSpeed = opts.zoomSpeed || 0.0015;
+    this.panSpeed = opts.panSpeed || 0.001;
 
     this._dragging = false;
+    this._dragButton = 0; // 0: left, 1: middle, 2: right
     this._last = [0, 0];
 
     this._initEvents();
@@ -20,8 +22,13 @@ class OrbitCamera {
   _initEvents() {
     this.canvas.addEventListener("pointerdown", (e) => {
       this._dragging = true;
+      this._dragButton = e.button;
       this._last = [e.clientX, e.clientY];
       this.canvas.setPointerCapture(e.pointerId);
+      e.preventDefault(); // Prevent context menu? No, need contextmenu event
+    });
+    this.canvas.addEventListener("contextmenu", (e) => {
+      e.preventDefault(); // Prevent context menu on right click
     });
     this.canvas.addEventListener("pointerup", (e) => {
       this._dragging = false;
@@ -32,16 +39,54 @@ class OrbitCamera {
       const dx = e.clientX - this._last[0];
       const dy = e.clientY - this._last[1];
       this._last = [e.clientX, e.clientY];
-      this.theta -= dx * this.rotateSpeed;
-      this.phi -= dy * this.rotateSpeed;
-      const eps = 0.001;
-      this.phi = Math.max(eps, Math.min(Math.PI - eps, this.phi));
+
+      if (this._dragButton === 0) {
+        // Orbit (Left click)
+        this.theta -= dx * this.rotateSpeed;
+        this.phi -= dy * this.rotateSpeed;
+        const eps = 0.001;
+        this.phi = Math.max(eps, Math.min(Math.PI - eps, this.phi));
+      } else if (this._dragButton === 1 || this._dragButton === 2) {
+        // Pan (Middle or Right click)
+        this.pan(-dx, dy); // Drag scene
+      }
     });
     this.canvas.addEventListener("wheel", (e) => {
       e.preventDefault();
       const factor = Math.exp(e.deltaY * this.zoomSpeed);
       this.radius = Math.min(this.maxRadius, Math.max(this.minRadius, this.radius * factor));
     }, { passive: false });
+  }
+
+  pan(dx, dy) {
+    // Compute camera basis vectors based on current angles
+    // z points from target to eye
+    const zx = Math.sin(this.phi) * Math.sin(this.theta);
+    const zy = Math.cos(this.phi);
+    const zz = Math.sin(this.phi) * Math.cos(this.theta);
+    const z = [zx, zy, zz]; // Normalized because phi/theta are spherical
+
+    // x = cross(up, z)
+    const up = [0, 1, 0];
+    let xx = up[1]*z[2] - up[2]*z[1];
+    let xy = up[2]*z[0] - up[0]*z[2];
+    let xz = up[0]*z[1] - up[1]*z[0];
+    const lenX = Math.hypot(xx, xy, xz);
+    if (lenX > 0.0001) {
+      xx/=lenX; xy/=lenX; xz/=lenX;
+    }
+
+    // y = cross(z, x)
+    let yx = z[1]*xz - z[2]*xy;
+    let yy = z[2]*xx - z[0]*xz;
+    let yz = z[0]*xy - z[1]*xx;
+
+    // Pan speed scaled by radius distance
+    const speed = this.panSpeed * this.radius;
+    
+    this.target[0] += (xx * dx + yx * dy) * speed;
+    this.target[1] += (xy * dx + yy * dy) * speed;
+    this.target[2] += (xz * dx + yz * dy) * speed;
   }
 
   getViewProj(aspect) {

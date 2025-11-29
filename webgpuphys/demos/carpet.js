@@ -19,7 +19,7 @@ async function main() {
     friction: 1.5,
     drag: 0.25,
     gravityY: -2,
-    sphereRadius: 0.6,
+    sphereRadius: 6,
     oscillate: true,
     showParticles: false, // Default off
     paused: false,
@@ -28,6 +28,11 @@ async function main() {
     objectCount: 256, // Increased default
     resolution: 2, // Default 2
     spawnShape: 'Mix', // Box, Cylinder, Tetris, Mix
+
+    // Container params
+    boxX: 12,
+    boxY: 48,
+    boxZ: 12,
   };
 
   let world = null;
@@ -69,8 +74,12 @@ async function main() {
       drag: params.drag,
       fixedTimeStep: 1 / 120,
       gravity: new Vec3(0, params.gravityY, 0),
-      boxSize: new Vec3(12, 12, 12),
-      gridPosition: new Vec3(-12, 0, -12),
+      boxSize: new Vec3(params.boxX, params.boxY, params.boxZ),
+      gridPosition: new Vec3(-params.boxX, 0, -params.boxZ), // Adjust grid origin if needed? Grid logic uses gridRes.
+      // Actually gridPosition determines where the spatial hash grid starts.
+      // If box changes size, we might need to move grid or ensure grid covers box.
+      // For now let's assume grid is large enough or user resets if needed.
+      // But let's link it to box size for reset.
       gridResolution: new Vec3(96, 48, 96),
       maxSubSteps: 8,
     });
@@ -329,6 +338,11 @@ async function main() {
   folderPhys.add(world, "fixedTimeStep", 0.001, 0.1, 0.001).name("Time Step");
   folderPhys.add(params, "gravityY", -20, 20, 0.1).name("Gravity Y").onChange(v => world.gravity = new Vec3(0, v, 0));
   
+  const folderContainer = gui.addFolder("Container");
+  folderContainer.add(params, "boxX", 2, 100, 1).name("Width (X)").onChange(v => { if(world) world.params.boxSize[0] = v; });
+  folderContainer.add(params, "boxY", 2, 100, 1).name("Height (Y)").onChange(v => { if(world) world.params.boxSize[1] = v; });
+  folderContainer.add(params, "boxZ", 2, 100, 1).name("Depth (Z)").onChange(v => { if(world) world.params.boxSize[2] = v; });
+
   gui.add(params, "sphereRadius", 0.1, 10, 0.05).onChange((v) => world.setSphereRadius(0, v));
   gui.add(params, "oscillate");
   gui.add(params, "showParticles").name("Render Particles");
