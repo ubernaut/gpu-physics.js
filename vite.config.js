@@ -5,16 +5,13 @@ export default defineConfig({
   root: __dirname,
   base: './', // Relative paths for deployment
   build: {
-    outDir: 'Docs',
+    outDir: 'docs',
     emptyOutDir: true,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
         demos: resolve(__dirname, 'demos/index.html'),
-        box: resolve(__dirname, 'demos/box.html'),
-        carpet: resolve(__dirname, 'demos/carpet.html'),
-        container: resolve(__dirname, 'demos/container.html'),
-        sphere: resolve(__dirname, 'demos/sphere.html'),
+        toychest: resolve(__dirname, 'demos/toychest.html'),
       },
     },
   },
@@ -25,7 +22,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    open: '/demos/index.html',
+    open: '/demos/toychest.html',
   },
   assetsInclude: ['**/*.wgsl'],
 });
