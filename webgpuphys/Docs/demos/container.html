@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebGPU Physics - Container Fill</title>
+  <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.19"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      background: #0f1024; 
+      display: flex; 
+      flex-direction: column;
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh;
+      font-family: system-ui, sans-serif;
+      color: #eee;
+      gap: 12px;
+    }
+    header {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      color: #a0a3c2;
+      font-size: 14px;
+    }
+    header a { color: #9ad1ff; text-decoration: none; }
+    canvas { border: 1px solid #2b2d4a; border-radius: 4px; }
+    #info { font-size: 14px; color: #888; }
+    #error { color: #ff6b6b; max-width: 600px; text-align: center; padding: 20px; }
+  </style>
+  <script type="module" crossorigin src="../assets/container-Bx5APB29.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/orbitControls-Bz_JsIjz.js">
+  <link rel="modulepreload" crossorigin href="../assets/boxRenderer-DyEUWp37.js">
+</head>
+<body>
+  <header>
+    <a href="./index.html">Many Boxes</a>
+    <span>•</span>
+    <a href="./box.html">Single Box</a>
+    <span>•</span>
+    <a href="./sphere.html">Sphere Interaction</a>
+    <span>•</span>
+    <span>Container Fill</span>
+    <span>•</span>
+    <a href="./carpet.html">Particle Carpet</a>
+  </header>
+  <canvas id="canvas" width="800" height="600"></canvas>
+  <div id="info">Bodies: <span id="bodyCount">0</span> | FPS: <span id="fps">0</span></div>
+  <div id="error"></div>
+</body>
+</html>

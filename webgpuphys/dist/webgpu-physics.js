@@ -45,8 +45,8 @@ class h {
     return this.data[0] * e.data[0] + this.data[1] * e.data[1] + this.data[2] * e.data[2];
   }
   cross(e) {
-    const t = this.data[0], i = this.data[1], n = this.data[2], a = e.data[0], r = e.data[1], o = e.data[2];
-    return this.data[0] = i * o - n * r, this.data[1] = n * a - t * o, this.data[2] = t * r - i * a, this;
+    const t = this.data[0], i = this.data[1], r = this.data[2], n = e.data[0], a = e.data[1], o = e.data[2];
+    return this.data[0] = i * o - r * a, this.data[1] = r * n - t * o, this.data[2] = t * a - i * n, this;
   }
   length() {
     return Math.sqrt(this.dot(this));
@@ -66,8 +66,8 @@ class h {
   }
 }
 class G {
-  constructor(e = 0, t = 0, i = 0, n = 0) {
-    this.data = new Float32Array([e, t, i, n]);
+  constructor(e = 0, t = 0, i = 0, r = 0) {
+    this.data = new Float32Array([e, t, i, r]);
   }
   get x() {
     return this.data[0];
@@ -93,8 +93,8 @@ class G {
   set w(e) {
     this.data[3] = e;
   }
-  set(e, t, i, n) {
-    return this.data[0] = e, this.data[1] = t, this.data[2] = i, this.data[3] = n, this;
+  set(e, t, i, r) {
+    return this.data[0] = e, this.data[1] = t, this.data[2] = i, this.data[3] = r, this;
   }
   copy(e) {
     return this.data[0] = e.data[0], this.data[1] = e.data[1], this.data[2] = e.data[2], this.data[3] = e.data[3], this;
@@ -103,9 +103,9 @@ class G {
     return new G(this.x, this.y, this.z, this.w);
   }
 }
-class w {
-  constructor(e = 0, t = 0, i = 0, n = 1) {
-    this.data = new Float32Array([e, t, i, n]);
+class z {
+  constructor(e = 0, t = 0, i = 0, r = 1) {
+    this.data = new Float32Array([e, t, i, r]);
   }
   get x() {
     return this.data[0];
@@ -131,14 +131,14 @@ class w {
   set w(e) {
     this.data[3] = e;
   }
-  set(e, t, i, n) {
-    return this.data[0] = e, this.data[1] = t, this.data[2] = i, this.data[3] = n, this;
+  set(e, t, i, r) {
+    return this.data[0] = e, this.data[1] = t, this.data[2] = i, this.data[3] = r, this;
   }
   copy(e) {
     return this.data[0] = e.data[0], this.data[1] = e.data[1], this.data[2] = e.data[2], this.data[3] = e.data[3], this;
   }
   clone() {
-    return new w(this.x, this.y, this.z, this.w);
+    return new z(this.x, this.y, this.z, this.w);
   }
   identity() {
     return this.set(0, 0, 0, 1);
@@ -155,27 +155,27 @@ class w {
     return this;
   }
   integrate(e, t) {
-    const i = t * 0.5, n = e.x, a = e.y, r = e.z;
-    return this.data[0] += i * (n * this.w + a * this.z - r * this.y), this.data[1] += i * (a * this.w + r * this.x - n * this.z), this.data[2] += i * (r * this.w + n * this.y - a * this.x), this.data[3] += i * (-n * this.x - a * this.y - r * this.z), this.normalize();
+    const i = t * 0.5, r = e.x, n = e.y, a = e.z;
+    return this.data[0] += i * (r * this.w + n * this.z - a * this.y), this.data[1] += i * (n * this.w + a * this.x - r * this.z), this.data[2] += i * (a * this.w + r * this.y - n * this.x), this.data[3] += i * (-r * this.x - n * this.y - a * this.z), this.normalize();
   }
   applyToVec3(e, t = new h()) {
-    const i = e.x, n = e.y, a = e.z, r = this.x, o = this.y, s = this.z, d = this.w, p = d * i + o * a - s * n, g = d * n + s * i - r * a, b = d * a + r * n - o * i, c = -r * i - o * n - s * a;
-    return t.data[0] = p * d + c * -r + g * -s - b * -o, t.data[1] = g * d + c * -o + b * -r - p * -s, t.data[2] = b * d + c * -s + p * -o - g * -r, t;
+    const i = e.x, r = e.y, n = e.z, a = this.x, o = this.y, s = this.z, d = this.w, p = d * i + o * n - s * r, g = d * r + s * i - a * n, b = d * n + a * r - o * i, c = -a * i - o * r - s * n;
+    return t.data[0] = p * d + c * -a + g * -s - b * -o, t.data[1] = g * d + c * -o + b * -a - p * -s, t.data[2] = b * d + c * -s + p * -o - g * -a, t;
   }
   setFromAxisAngle(e, t) {
-    const i = t * 0.5, n = Math.sin(i);
-    return this.data[0] = e.x * n, this.data[1] = e.y * n, this.data[2] = e.z * n, this.data[3] = Math.cos(i), this;
+    const i = t * 0.5, r = Math.sin(i);
+    return this.data[0] = e.x * r, this.data[1] = e.y * r, this.data[2] = e.z * r, this.data[3] = Math.cos(i), this;
   }
   multiply(e) {
-    const t = this.x, i = this.y, n = this.z, a = this.w, r = e.x, o = e.y, s = e.z, d = e.w;
-    return this.data[0] = t * d + a * r + i * s - n * o, this.data[1] = i * d + a * o + n * r - t * s, this.data[2] = n * d + a * s + t * o - i * r, this.data[3] = a * d - t * r - i * o - n * s, this;
+    const t = this.x, i = this.y, r = this.z, n = this.w, a = e.x, o = e.y, s = e.z, d = e.w;
+    return this.data[0] = t * d + n * a + i * s - r * o, this.data[1] = i * d + n * o + r * a - t * s, this.data[2] = r * d + n * s + t * o - i * a, this.data[3] = n * d - t * a - i * o - r * s, this;
   }
-  static slerp(e, t, i, n = new w()) {
-    let a = e.x * t.x + e.y * t.y + e.z * t.z + e.w * t.w, r = t.x, o = t.y, s = t.z, d = t.w;
-    if (a < 0 && (r = -r, o = -o, s = -s, d = -d, a = -a), a > 0.9995)
-      return n.data[0] = e.x + i * (r - e.x), n.data[1] = e.y + i * (o - e.y), n.data[2] = e.z + i * (s - e.z), n.data[3] = e.w + i * (d - e.w), n.normalize();
-    const p = Math.acos(a), g = p * i, b = Math.sin(g), c = Math.sin(p), v = Math.cos(g) - a * b / c, m = b / c;
-    return n.data[0] = e.x * v + r * m, n.data[1] = e.y * v + o * m, n.data[2] = e.z * v + s * m, n.data[3] = e.w * v + d * m, n;
+  static slerp(e, t, i, r = new z()) {
+    let n = e.x * t.x + e.y * t.y + e.z * t.z + e.w * t.w, a = t.x, o = t.y, s = t.z, d = t.w;
+    if (n < 0 && (a = -a, o = -o, s = -s, d = -d, n = -n), n > 0.9995)
+      return r.data[0] = e.x + i * (a - e.x), r.data[1] = e.y + i * (o - e.y), r.data[2] = e.z + i * (s - e.z), r.data[3] = e.w + i * (d - e.w), r.normalize();
+    const p = Math.acos(n), g = p * i, b = Math.sin(g), c = Math.sin(p), m = Math.cos(g) - n * b / c, v = b / c;
+    return r.data[0] = e.x * m + a * v, r.data[1] = e.y * m + o * v, r.data[2] = e.z * m + s * v, r.data[3] = e.w * m + d * v, r;
   }
 }
 class R {
@@ -186,8 +186,8 @@ class R {
     return this.data.fill(0), this.data[0] = 1, this.data[4] = 1, this.data[8] = 1, this;
   }
   fromQuat(e) {
-    const t = e.x, i = e.y, n = e.z, a = e.w, r = t + t, o = i + i, s = n + n, d = t * r, p = t * o, g = t * s, b = i * o, c = i * s, v = n * s, m = a * r, I = a * o, B = a * s;
-    return this.data[0] = 1 - (b + v), this.data[1] = p + B, this.data[2] = g - I, this.data[3] = p - B, this.data[4] = 1 - (d + v), this.data[5] = c + m, this.data[6] = g + I, this.data[7] = c - m, this.data[8] = 1 - (d + b), this;
+    const t = e.x, i = e.y, r = e.z, n = e.w, a = t + t, o = i + i, s = r + r, d = t * a, p = t * o, g = t * s, b = i * o, c = i * s, m = r * s, v = n * a, w = n * o, I = n * s;
+    return this.data[0] = 1 - (b + m), this.data[1] = p + I, this.data[2] = g - w, this.data[3] = p - I, this.data[4] = 1 - (d + m), this.data[5] = c + v, this.data[6] = g + w, this.data[7] = c - v, this.data[8] = 1 - (d + b), this;
   }
   transpose() {
     const e = this.data;
@@ -195,12 +195,12 @@ class R {
     return t = e[1], e[1] = e[3], e[3] = t, t = e[2], e[2] = e[6], e[6] = t, t = e[5], e[5] = e[7], e[7] = t, this;
   }
   multiply(e) {
-    const t = this.data, i = [...t], n = e.data;
-    return t[0] = i[0] * n[0] + i[3] * n[1] + i[6] * n[2], t[1] = i[1] * n[0] + i[4] * n[1] + i[7] * n[2], t[2] = i[2] * n[0] + i[5] * n[1] + i[8] * n[2], t[3] = i[0] * n[3] + i[3] * n[4] + i[6] * n[5], t[4] = i[1] * n[3] + i[4] * n[4] + i[7] * n[5], t[5] = i[2] * n[3] + i[5] * n[4] + i[8] * n[5], t[6] = i[0] * n[6] + i[3] * n[7] + i[6] * n[8], t[7] = i[1] * n[6] + i[4] * n[7] + i[7] * n[8], t[8] = i[2] * n[6] + i[5] * n[7] + i[8] * n[8], this;
+    const t = this.data, i = [...t], r = e.data;
+    return t[0] = i[0] * r[0] + i[3] * r[1] + i[6] * r[2], t[1] = i[1] * r[0] + i[4] * r[1] + i[7] * r[2], t[2] = i[2] * r[0] + i[5] * r[1] + i[8] * r[2], t[3] = i[0] * r[3] + i[3] * r[4] + i[6] * r[5], t[4] = i[1] * r[3] + i[4] * r[4] + i[7] * r[5], t[5] = i[2] * r[3] + i[5] * r[4] + i[8] * r[5], t[6] = i[0] * r[6] + i[3] * r[7] + i[6] * r[8], t[7] = i[1] * r[6] + i[4] * r[7] + i[7] * r[8], t[8] = i[2] * r[6] + i[5] * r[7] + i[8] * r[8], this;
   }
   applyToVec3(e, t = new h()) {
-    const i = this.data, n = e.x, a = e.y, r = e.z;
-    return t.data[0] = i[0] * n + i[3] * a + i[6] * r, t.data[1] = i[1] * n + i[4] * a + i[7] * r, t.data[2] = i[2] * n + i[5] * a + i[8] * r, t;
+    const i = this.data, r = e.x, n = e.y, a = e.z;
+    return t.data[0] = i[0] * r + i[3] * n + i[6] * a, t.data[1] = i[1] * r + i[4] * n + i[7] * a, t.data[2] = i[2] * r + i[5] * n + i[8] * a, t;
   }
   setDiagonal(e) {
     return this.data.fill(0), this.data[0] = e.x, this.data[4] = e.y, this.data[8] = e.z, this;
@@ -228,10 +228,11 @@ async function W() {
   });
   const i = [];
   e.features && e.features.has && e.features.has("timestamp-query") && i.push("timestamp-query");
-  const n = await e.requestDevice({
+  const r = await e.requestDevice({
     requiredFeatures: i,
     requiredLimits: {
       maxStorageBufferBindingSize: e.limits.maxStorageBufferBindingSize,
+      maxBufferSize: e.limits.maxBufferSize,
       maxComputeWorkgroupsPerDimension: e.limits.maxComputeWorkgroupsPerDimension,
       maxComputeInvocationsPerWorkgroup: e.limits.maxComputeInvocationsPerWorkgroup,
       maxComputeWorkgroupSizeX: e.limits.maxComputeWorkgroupSizeX,
@@ -239,15 +240,15 @@ async function W() {
       maxComputeWorkgroupSizeZ: e.limits.maxComputeWorkgroupSizeZ
     }
   });
-  return n.lost.then((a) => {
-    console.error("WebGPU device lost:", a.message), a.reason !== "destroyed" && console.error("Device loss reason:", a.reason);
-  }), n.onuncapturederror = (a) => {
-    console.error("WebGPU uncaptured error:", a.error);
+  return r.lost.then((n) => {
+    console.error("WebGPU device lost:", n.message), n.reason !== "destroyed" && console.error("Device loss reason:", n.reason);
+  }), r.onuncapturederror = (n) => {
+    console.error("WebGPU uncaptured error:", n.error);
   }, {
     adapter: e,
-    device: n,
-    features: n.features,
-    limits: n.limits
+    device: r,
+    features: r.features,
+    limits: r.limits
   };
 }
 function f(u, e, t) {
@@ -271,7 +272,7 @@ function _(u, e, t) {
     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
   });
 }
-function V(u, e, t) {
+function B(u, e, t) {
   return u.createBuffer({
     label: t || "staging-buffer",
     size: e,
@@ -281,19 +282,19 @@ function V(u, e, t) {
 function x(u, e, t, i = 0) {
   u.queue.writeBuffer(e, i, t);
 }
-async function q(u, e, t, i) {
-  const n = u.createCommandEncoder();
-  n.copyBufferToBuffer(e, 0, t, 0, i), u.queue.submit([n.finish()]), await t.mapAsync(GPUMapMode.READ);
-  const a = t.getMappedRange().slice(0);
-  return t.unmap(), a;
+async function V(u, e, t, i) {
+  const r = u.createCommandEncoder();
+  r.copyBufferToBuffer(e, 0, t, 0, i), u.queue.submit([r.finish()]), await t.mapAsync(GPUMapMode.READ);
+  const n = t.getMappedRange().slice(0);
+  return t.unmap(), n;
 }
 function F(u, e) {
   return Math.ceil(u / e) * e;
 }
-function P(u, e) {
+function q(u, e) {
   return Math.ceil(u / e);
 }
-const M = `// Shared WGSL utilities for WebGPU Physics
+const O = `// Shared WGSL utilities for WebGPU Physics
 
 // Simulation parameters uniform buffer
 struct Params {
@@ -469,7 +470,7 @@ fn particleForce(
   
   return springForce + dampingForce + tangentForce;
 }
-`, O = `// Transform local particle positions to world space
+`, M = `// Transform local particle positions to world space
 
 @group(0) @binding(0) var<uniform> params: Params;
 @group(0) @binding(1) var<storage, read> particleLocalPos: array<vec4<f32>>;
@@ -524,7 +525,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
   
   particleRelativePos[particleIndex] = vec4<f32>(relativePos, f32(bodyId));
 }
-`, U = `// Derive particle velocities from body velocities
+`, D = `// Derive particle velocities from body velocities
 
 @group(0) @binding(0) var<uniform> params: Params;
 @group(0) @binding(1) var<storage, read> particleRelativePos: array<vec4<f32>>;
@@ -552,14 +553,18 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
   
   particleVel[particleIndex] = vec4<f32>(vel, 1.0);
 }
-`, D = `// Clear the spatial hash grid
+`, U = `// Clear the spatial hash grid
 
 @group(0) @binding(0) var<uniform> params: Params;
 @group(0) @binding(1) var<storage, read_write> gridCellCount: array<atomic<u32>>;
 
 @compute @workgroup_size(WORKGROUP_SIZE)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
-  let cellIndex = id.x;
+  // Calculate linear index from 2D dispatch to support > 65535 workgroups
+  // stride (dispatchX * WORKGROUP_SIZE) is stored in params.maxVelocity.w
+  let stride = u32(params.maxVelocity.w);
+  let cellIndex = id.y * stride + id.x;
+  
   let gridRes = vec3<i32>(params.gridRes.xyz);
   let totalCells = u32(gridRes.x * gridRes.y * gridRes.z);
   
@@ -1115,7 +1120,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
   
   bodyQuatOut[bodyIndex] = newQuat;
 }
-`, z = 64, C = 4;
+`, P = 64, C = 4;
 class N {
   constructor(e = {}) {
     // WebGPU context
@@ -1159,7 +1164,7 @@ class N {
     // Initialization promise
     l(this, "initPromise");
     l(this, "initialized", !1);
-    var i, n, a;
+    var i, r, n;
     this.maxBodies = e.maxBodies || 64, this.maxParticles = e.maxParticles || 256, this.maxSubSteps = e.maxSubSteps || 5, this.params = {
       stiffness: e.stiffness ?? 1700,
       damping: e.damping ?? 6,
@@ -1168,16 +1173,16 @@ class N {
       radius: e.radius ?? 0.5,
       fixedTimeStep: e.fixedTimeStep ?? 1 / 120,
       gravity: ((i = e.gravity) == null ? void 0 : i.data) ?? new Float32Array([0, -9.81, 0]),
-      boxSize: ((n = e.boxSize) == null ? void 0 : n.data) ?? new Float32Array([10, 10, 10])
+      boxSize: ((r = e.boxSize) == null ? void 0 : r.data) ?? new Float32Array([10, 10, 10])
     };
     const t = e.gridResolution || new h(64, 64, 64);
     this.grid = {
-      position: ((a = e.gridPosition) == null ? void 0 : a.data) ?? new Float32Array([0, 0, 0]),
+      position: ((n = e.gridPosition) == null ? void 0 : n.data) ?? new Float32Array([0, 0, 0]),
       resolution: t.data,
       maxParticlesPerCell: C
     }, this.bodyPositions = new Float32Array(this.maxBodies * 4), this.bodyQuaternions = new Float32Array(this.maxBodies * 4), this.bodyMasses = new Float32Array(this.maxBodies * 4), this.particleLocalPositions = new Float32Array(this.maxParticles * 4);
-    for (let r = 0; r < this.maxBodies; r++)
-      this.bodyQuaternions[r * 4 + 3] = 1;
+    for (let a = 0; a < this.maxBodies; a++)
+      this.bodyQuaternions[a * 4 + 3] = 1;
     this.initPromise = this.initialize();
   }
   /**
@@ -1196,7 +1201,13 @@ class N {
    * Create all GPU buffers
    */
   createBuffers() {
-    const e = this.device, t = this.maxBodies * 4 * 4, i = this.maxParticles * 4 * 4, n = Math.ceil(this.grid.resolution[0]) * Math.ceil(this.grid.resolution[1]) * Math.ceil(this.grid.resolution[2]), a = n * 4, r = n * C * 4;
+    const e = this.device, t = this.maxBodies * 4 * 4, i = this.maxParticles * 4 * 4, r = Math.ceil(this.grid.resolution[0]) * Math.ceil(this.grid.resolution[1]) * Math.ceil(this.grid.resolution[2]), n = Math.ceil(r / P), a = 65535;
+    this.gridDispatch = {
+      x: Math.min(n, a),
+      y: Math.ceil(n / a),
+      z: 1
+    }, this.gridStride = this.gridDispatch.x * P;
+    const o = r * 4, s = r * C * 4;
     this.buffers = {
       // Body buffers (double-buffered)
       bodyPositionA: y(e, t, "body-position-a"),
@@ -1218,25 +1229,25 @@ class N {
       particleForce: y(e, i, "particle-force"),
       particleTorque: y(e, i, "particle-torque"),
       // Broadphase grid
-      gridCellCount: y(e, a, "grid-cell-count"),
-      gridCellParticles: y(e, r, "grid-cell-particles"),
+      gridCellCount: y(e, o, "grid-cell-count"),
+      gridCellParticles: y(e, s, "grid-cell-particles"),
       // Uniform params buffer (aligned to 256 bytes for uniform binding)
       params: _(e, F(256, 256), "params"),
       // Staging buffers for CPU readback
-      stagingPosition: V(e, t, "staging-position"),
-      stagingQuaternion: V(e, t, "staging-quaternion")
+      stagingPosition: B(e, t, "staging-position"),
+      stagingQuaternion: B(e, t, "staging-quaternion")
     };
   }
   /**
    * Create compute pipelines
    */
   async createPipelines() {
-    const e = this.device, t = (s) => M + `
+    const e = this.device, t = (s) => O + `
 ` + s, i = (s, d) => ({
       binding: s,
       visibility: GPUShaderStage.COMPUTE,
       buffer: { type: d }
-    }), n = (s, d) => e.createBindGroupLayout({ label: s, entries: d }), a = (s, d, p) => e.createComputePipeline({
+    }), r = (s, d) => e.createBindGroupLayout({ label: s, entries: d }), n = (s, d, p) => e.createComputePipeline({
       label: s,
       layout: e.createPipelineLayout({
         label: `${s}-layout`,
@@ -1246,11 +1257,11 @@ class N {
         module: d,
         entryPoint: "main"
       }
-    }), r = {
-      localToWorld: f(e, t(O), "local-to-world"),
+    }), a = {
+      localToWorld: f(e, t(M), "local-to-world"),
       localToRelative: f(e, t(k), "local-to-relative"),
-      bodyVelToParticleVel: f(e, t(U), "body-vel-to-particle-vel"),
-      clearGrid: f(e, t(D), "clear-grid"),
+      bodyVelToParticleVel: f(e, t(D), "body-vel-to-particle-vel"),
+      clearGrid: f(e, t(U), "clear-grid"),
       buildGrid: f(e, t(Q), "build-grid"),
       updateForce: f(e, t(E), "update-force"),
       updateTorque: f(e, t(L), "update-torque"),
@@ -1261,38 +1272,38 @@ class N {
       updateBodyPosition: f(e, t(X), "update-body-position"),
       updateBodyQuaternion: f(e, t($), "update-body-quaternion")
     }, o = {
-      localToWorld: n("layout/local-to-world", [
+      localToWorld: r("layout/local-to-world", [
         i(0, "uniform"),
         i(1, "read-only-storage"),
         i(2, "read-only-storage"),
         i(3, "read-only-storage"),
         i(4, "storage")
       ]),
-      localToRelative: n("layout/local-to-relative", [
+      localToRelative: r("layout/local-to-relative", [
         i(0, "uniform"),
         i(1, "read-only-storage"),
         i(2, "read-only-storage"),
         i(3, "read-only-storage"),
         i(4, "storage")
       ]),
-      bodyVelToParticleVel: n("layout/body-vel-to-particle-vel", [
+      bodyVelToParticleVel: r("layout/body-vel-to-particle-vel", [
         i(0, "uniform"),
         i(1, "read-only-storage"),
         i(2, "read-only-storage"),
         i(3, "read-only-storage"),
         i(4, "storage")
       ]),
-      clearGrid: n("layout/clear-grid", [
+      clearGrid: r("layout/clear-grid", [
         i(0, "uniform"),
         i(1, "storage")
       ]),
-      buildGrid: n("layout/build-grid", [
+      buildGrid: r("layout/build-grid", [
         i(0, "uniform"),
         i(1, "read-only-storage"),
         i(2, "storage"),
         i(3, "storage")
       ]),
-      updateForce: n("layout/update-force", [
+      updateForce: r("layout/update-force", [
         i(0, "uniform"),
         i(1, "read-only-storage"),
         i(2, "read-only-storage"),
@@ -1302,7 +1313,7 @@ class N {
         i(6, "read-only-storage"),
         i(7, "storage")
       ]),
-      updateTorque: n("layout/update-torque", [
+      updateTorque: r("layout/update-torque", [
         i(0, "uniform"),
         i(1, "read-only-storage"),
         i(2, "read-only-storage"),
@@ -1312,13 +1323,13 @@ class N {
         i(6, "read-only-storage"),
         i(7, "storage")
       ]),
-      reduceForce: n("layout/reduce-force", [
+      reduceForce: r("layout/reduce-force", [
         i(0, "uniform"),
         i(1, "read-only-storage"),
         i(2, "read-only-storage"),
         i(3, "storage")
       ]),
-      reduceTorque: n("layout/reduce-torque", [
+      reduceTorque: r("layout/reduce-torque", [
         i(0, "uniform"),
         i(1, "read-only-storage"),
         i(2, "read-only-storage"),
@@ -1326,14 +1337,14 @@ class N {
         i(4, "read-only-storage"),
         i(5, "storage")
       ]),
-      updateBodyVelocity: n("layout/update-body-velocity", [
+      updateBodyVelocity: r("layout/update-body-velocity", [
         i(0, "uniform"),
         i(1, "read-only-storage"),
         i(2, "read-only-storage"),
         i(3, "read-only-storage"),
         i(4, "storage")
       ]),
-      updateBodyAngularVelocity: n("layout/update-body-angular-velocity", [
+      updateBodyAngularVelocity: r("layout/update-body-angular-velocity", [
         i(0, "uniform"),
         i(1, "read-only-storage"),
         i(2, "read-only-storage"),
@@ -1341,13 +1352,13 @@ class N {
         i(4, "read-only-storage"),
         i(5, "storage")
       ]),
-      updateBodyPosition: n("layout/update-body-position", [
+      updateBodyPosition: r("layout/update-body-position", [
         i(0, "uniform"),
         i(1, "read-only-storage"),
         i(2, "read-only-storage"),
         i(3, "storage")
       ]),
-      updateBodyQuaternion: n("layout/update-body-quaternion", [
+      updateBodyQuaternion: r("layout/update-body-quaternion", [
         i(0, "uniform"),
         i(1, "read-only-storage"),
         i(2, "read-only-storage"),
@@ -1355,19 +1366,19 @@ class N {
       ])
     };
     this.layouts = o, this.pipelines = {
-      localToWorld: a("local-to-world", r.localToWorld, o.localToWorld),
-      localToRelative: a("local-to-relative", r.localToRelative, o.localToRelative),
-      bodyVelToParticleVel: a("body-vel-to-particle-vel", r.bodyVelToParticleVel, o.bodyVelToParticleVel),
-      clearGrid: a("clear-grid", r.clearGrid, o.clearGrid),
-      buildGrid: a("build-grid", r.buildGrid, o.buildGrid),
-      updateForce: a("update-force", r.updateForce, o.updateForce),
-      updateTorque: a("update-torque", r.updateTorque, o.updateTorque),
-      reduceForce: a("reduce-force", r.reduceForce, o.reduceForce),
-      reduceTorque: a("reduce-torque", r.reduceTorque, o.reduceTorque),
-      updateBodyVelocity: a("update-body-velocity", r.updateBodyVelocity, o.updateBodyVelocity),
-      updateBodyAngularVelocity: a("update-body-angular-velocity", r.updateBodyAngularVelocity, o.updateBodyAngularVelocity),
-      updateBodyPosition: a("update-body-position", r.updateBodyPosition, o.updateBodyPosition),
-      updateBodyQuaternion: a("update-body-quaternion", r.updateBodyQuaternion, o.updateBodyQuaternion)
+      localToWorld: n("local-to-world", a.localToWorld, o.localToWorld),
+      localToRelative: n("local-to-relative", a.localToRelative, o.localToRelative),
+      bodyVelToParticleVel: n("body-vel-to-particle-vel", a.bodyVelToParticleVel, o.bodyVelToParticleVel),
+      clearGrid: n("clear-grid", a.clearGrid, o.clearGrid),
+      buildGrid: n("build-grid", a.buildGrid, o.buildGrid),
+      updateForce: n("update-force", a.updateForce, o.updateForce),
+      updateTorque: n("update-torque", a.updateTorque, o.updateTorque),
+      reduceForce: n("reduce-force", a.reduceForce, o.reduceForce),
+      reduceTorque: n("reduce-torque", a.reduceTorque, o.reduceTorque),
+      updateBodyVelocity: n("update-body-velocity", a.updateBodyVelocity, o.updateBodyVelocity),
+      updateBodyAngularVelocity: n("update-body-angular-velocity", a.updateBodyAngularVelocity, o.updateBodyAngularVelocity),
+      updateBodyPosition: n("update-body-position", a.updateBodyPosition, o.updateBodyPosition),
+      updateBodyQuaternion: n("update-body-quaternion", a.updateBodyQuaternion, o.updateBodyQuaternion)
     };
   }
   /**
@@ -1380,14 +1391,14 @@ class N {
    * Update bind groups after buffer swap
    */
   updateBindGroups() {
-    const e = this.device, t = this.buffers, i = this.layouts, n = this.bufferIndex === 0 ? t.bodyPositionA : t.bodyPositionB, a = this.bufferIndex === 0 ? t.bodyPositionB : t.bodyPositionA, r = this.bufferIndex === 0 ? t.bodyQuaternionA : t.bodyQuaternionB, o = this.bufferIndex === 0 ? t.bodyQuaternionB : t.bodyQuaternionA, s = this.bufferIndex === 0 ? t.bodyVelocityA : t.bodyVelocityB, d = this.bufferIndex === 0 ? t.bodyVelocityB : t.bodyVelocityA, p = this.bufferIndex === 0 ? t.bodyAngularVelocityA : t.bodyAngularVelocityB, g = this.bufferIndex === 0 ? t.bodyAngularVelocityB : t.bodyAngularVelocityA;
+    const e = this.device, t = this.buffers, i = this.layouts, r = this.bufferIndex === 0 ? t.bodyPositionA : t.bodyPositionB, n = this.bufferIndex === 0 ? t.bodyPositionB : t.bodyPositionA, a = this.bufferIndex === 0 ? t.bodyQuaternionA : t.bodyQuaternionB, o = this.bufferIndex === 0 ? t.bodyQuaternionB : t.bodyQuaternionA, s = this.bufferIndex === 0 ? t.bodyVelocityA : t.bodyVelocityB, d = this.bufferIndex === 0 ? t.bodyVelocityB : t.bodyVelocityA, p = this.bufferIndex === 0 ? t.bodyAngularVelocityA : t.bodyAngularVelocityB, g = this.bufferIndex === 0 ? t.bodyAngularVelocityB : t.bodyAngularVelocityA;
     this.bindGroups.set("localToWorld", e.createBindGroup({
       layout: i.localToWorld,
       entries: [
         { binding: 0, resource: { buffer: t.params } },
         { binding: 1, resource: { buffer: t.particleLocalPosition } },
-        { binding: 2, resource: { buffer: n } },
-        { binding: 3, resource: { buffer: r } },
+        { binding: 2, resource: { buffer: r } },
+        { binding: 3, resource: { buffer: a } },
         { binding: 4, resource: { buffer: t.particleWorldPosition } }
       ]
     })), this.bindGroups.set("localToRelative", e.createBindGroup({
@@ -1395,8 +1406,8 @@ class N {
       entries: [
         { binding: 0, resource: { buffer: t.params } },
         { binding: 1, resource: { buffer: t.particleLocalPosition } },
-        { binding: 2, resource: { buffer: n } },
-        { binding: 3, resource: { buffer: r } },
+        { binding: 2, resource: { buffer: r } },
+        { binding: 3, resource: { buffer: a } },
         { binding: 4, resource: { buffer: t.particleRelativePosition } }
       ]
     })), this.bindGroups.set("bodyVelToParticleVel", e.createBindGroup({
@@ -1480,23 +1491,23 @@ class N {
         { binding: 1, resource: { buffer: p } },
         { binding: 2, resource: { buffer: t.bodyTorque } },
         { binding: 3, resource: { buffer: t.bodyMass } },
-        { binding: 4, resource: { buffer: r } },
+        { binding: 4, resource: { buffer: a } },
         { binding: 5, resource: { buffer: g } }
       ]
     })), this.bindGroups.set("updateBodyPosition", e.createBindGroup({
       layout: i.updateBodyPosition,
       entries: [
         { binding: 0, resource: { buffer: t.params } },
-        { binding: 1, resource: { buffer: n } },
+        { binding: 1, resource: { buffer: r } },
         { binding: 2, resource: { buffer: d } },
         // Use updated velocity
-        { binding: 3, resource: { buffer: a } }
+        { binding: 3, resource: { buffer: n } }
       ]
     })), this.bindGroups.set("updateBodyQuaternion", e.createBindGroup({
       layout: i.updateBodyQuaternion,
       entries: [
         { binding: 0, resource: { buffer: t.params } },
-        { binding: 1, resource: { buffer: r } },
+        { binding: 1, resource: { buffer: a } },
         { binding: 2, resource: { buffer: g } },
         // Use updated angular velocity
         { binding: 3, resource: { buffer: o } }
@@ -1522,25 +1533,25 @@ class N {
     const e = new Float32Array(32);
     e[0] = this.params.stiffness, e[1] = this.params.damping, e[2] = this.params.radius, e[3] = this._particleCount, e[4] = this.params.fixedTimeStep, e[5] = this.params.friction, e[6] = this.params.drag, e[7] = this._bodyCount, e[8] = this.params.gravity[0], e[9] = this.params.gravity[1], e[10] = this.params.gravity[2], e[11] = 0, e[12] = this.params.boxSize[0], e[13] = this.params.boxSize[1], e[14] = this.params.boxSize[2], e[15] = 0, e[16] = this.grid.position[0], e[17] = this.grid.position[1], e[18] = this.grid.position[2], e[19] = 0, e[20] = this.grid.resolution[0], e[21] = this.grid.resolution[1], e[22] = this.grid.resolution[2], e[23] = this.grid.maxParticlesPerCell, e[24] = this.interactionSphere.position.x, e[25] = this.interactionSphere.position.y, e[26] = this.interactionSphere.position.z, e[27] = this.interactionSphere.radius;
     const t = 2 * this.params.radius / this.params.fixedTimeStep;
-    e[28] = t, e[29] = t, e[30] = t, e[31] = 0, x(this.device, this.buffers.params, e);
+    e[28] = t, e[29] = t, e[30] = t, e[31] = this.gridStride || 0, x(this.device, this.buffers.params, e);
   }
   /**
    * Add a rigid body to the simulation
    */
-  addBody(e, t, i, n, a, r, o, s, d, p, g) {
+  addBody(e, t, i, r, n, a, o, s, d, p, g) {
     if (this._bodyCount >= this.maxBodies)
       return console.warn(`Cannot add body: maximum (${this.maxBodies}) reached`), -1;
     const b = this._bodyCount, c = b * 4;
-    return this.bodyPositions[c] = e, this.bodyPositions[c + 1] = t, this.bodyPositions[c + 2] = i, this.bodyPositions[c + 3] = 1, this.bodyQuaternions[c] = n, this.bodyQuaternions[c + 1] = a, this.bodyQuaternions[c + 2] = r, this.bodyQuaternions[c + 3] = o, this.bodyMasses[c] = d > 0 ? 1 / d : 0, this.bodyMasses[c + 1] = p > 0 ? 1 / p : 0, this.bodyMasses[c + 2] = g > 0 ? 1 / g : 0, this.bodyMasses[c + 3] = s > 0 ? 1 / s : 0, this._bodyCount++, this.bodyDataDirty = !0, this.massDirty = !0, b;
+    return this.bodyPositions[c] = e, this.bodyPositions[c + 1] = t, this.bodyPositions[c + 2] = i, this.bodyPositions[c + 3] = 1, this.bodyQuaternions[c] = r, this.bodyQuaternions[c + 1] = n, this.bodyQuaternions[c + 2] = a, this.bodyQuaternions[c + 3] = o, this.bodyMasses[c] = d > 0 ? 1 / d : 0, this.bodyMasses[c + 1] = p > 0 ? 1 / p : 0, this.bodyMasses[c + 2] = g > 0 ? 1 / g : 0, this.bodyMasses[c + 3] = s > 0 ? 1 / s : 0, this._bodyCount++, this.bodyDataDirty = !0, this.massDirty = !0, b;
   }
   /**
    * Add a collision particle to a body
    */
-  addParticle(e, t, i, n) {
+  addParticle(e, t, i, r) {
     if (this._particleCount >= this.maxParticles)
       return console.warn(`Cannot add particle: maximum (${this.maxParticles}) reached`), -1;
-    const a = this._particleCount, r = a * 4;
-    return this.particleLocalPositions[r] = t, this.particleLocalPositions[r + 1] = i, this.particleLocalPositions[r + 2] = n, this.particleLocalPositions[r + 3] = e, this._particleCount++, this.particleDataDirty = !0, a;
+    const n = this._particleCount, a = n * 4;
+    return this.particleLocalPositions[a] = t, this.particleLocalPositions[a + 1] = i, this.particleLocalPositions[a + 2] = r, this.particleLocalPositions[a + 3] = e, this._particleCount++, this.particleDataDirty = !0, n;
   }
   /**
    * Step the simulation forward by deltaTime
@@ -1563,7 +1574,7 @@ class N {
     this.flushData();
     const e = this.device.createCommandEncoder({ label: "physics-step" });
     e.clearBuffer(this.buffers.bodyForce), e.clearBuffer(this.buffers.bodyTorque), e.clearBuffer(this.buffers.gridCellParticles);
-    const t = P(this._particleCount, z), i = P(this._bodyCount, z), n = Math.ceil(this.grid.resolution[0]) * Math.ceil(this.grid.resolution[1]) * Math.ceil(this.grid.resolution[2]), a = P(n, z);
+    const t = q(this._particleCount, P), i = q(this._bodyCount, P);
     {
       const r = e.beginComputePass({ label: "local-to-world" });
       r.setPipeline(this.pipelines.localToWorld), r.setBindGroup(0, this.bindGroups.get("localToWorld")), r.dispatchWorkgroups(t), r.end();
@@ -1578,7 +1589,7 @@ class N {
     }
     {
       const r = e.beginComputePass({ label: "clear-grid" });
-      r.setPipeline(this.pipelines.clearGrid), r.setBindGroup(0, this.bindGroups.get("clearGrid")), r.dispatchWorkgroups(a), r.end();
+      r.setPipeline(this.pipelines.clearGrid), r.setBindGroup(0, this.bindGroups.get("clearGrid")), r.dispatchWorkgroups(this.gridDispatch.x, this.gridDispatch.y, this.gridDispatch.z), r.end();
     }
     {
       const r = e.beginComputePass({ label: "build-grid" });
@@ -1686,9 +1697,9 @@ class N {
   /**
    * Set interaction sphere position
    */
-  setSpherePosition(e, t, i, n) {
+  setSpherePosition(e, t, i, r) {
     if (e !== 0) throw new Error("Multiple spheres not supported yet");
-    this.interactionSphere.position.set(t, i, n);
+    this.interactionSphere.position.set(t, i, r);
   }
   /**
    * Get interaction sphere position
@@ -1715,14 +1726,14 @@ class N {
    * Read body positions from GPU (async)
    */
   async readBodyPositions() {
-    const e = this._bodyCount * 4 * 4, t = this.bufferIndex === 0 ? this.buffers.bodyPositionA : this.buffers.bodyPositionB, i = await q(this.device, t, this.buffers.stagingPosition, e);
+    const e = this._bodyCount * 4 * 4, t = this.bufferIndex === 0 ? this.buffers.bodyPositionA : this.buffers.bodyPositionB, i = await V(this.device, t, this.buffers.stagingPosition, e);
     return new Float32Array(i);
   }
   /**
    * Read body quaternions from GPU (async)
    */
   async readBodyQuaternions() {
-    const e = this._bodyCount * 4 * 4, t = this.bufferIndex === 0 ? this.buffers.bodyQuaternionA : this.buffers.bodyQuaternionB, i = await q(this.device, t, this.buffers.stagingQuaternion, e);
+    const e = this._bodyCount * 4 * 4, t = this.bufferIndex === 0 ? this.buffers.bodyQuaternionA : this.buffers.bodyQuaternionB, i = await V(this.device, t, this.buffers.stagingQuaternion, e);
     return new Float32Array(i);
   }
   /**
@@ -1755,7 +1766,7 @@ class N {
 const J = "1.0.0";
 export {
   R as Mat3,
-  w as Quat,
+  z as Quat,
   J as VERSION,
   h as Vec3,
   G as Vec4,
