@@ -21,12 +21,12 @@ async function main() {
     gravityY: -2,
     sphereRadius: 0.6,
     oscillate: true,
-    showParticles: true,
+    showParticles: false, // Default off
     paused: false,
     
     // Generator params
-    objectCount: 64,
-    resolution: 2, // N particles per unit size
+    objectCount: 256, // Increased default
+    resolution: 2, // Default 2
     spawnShape: 'Mix', // Box, Cylinder, Tetris, Mix
   };
 
@@ -60,8 +60,8 @@ async function main() {
     
     // Create new world locally
     const newWorld = new World({
-      maxBodies: 4096,
-      maxParticles: 65536,
+      maxBodies: 16384, // Increased limit
+      maxParticles: 131072, // Increased limit (128k)
       radius: r,
       stiffness: params.stiffness,
       damping: params.damping,
@@ -148,19 +148,9 @@ async function main() {
     function addCompoundBox(x, y, z) {
         const bodyStart = w.bodyCount;
         
-        // Box is NxNxN particles.
-        // Size = N * 2r.
         const size = N * 2 * r;
-        // Total mass? Or particle mass = 1?
-        // Let's assume uniform density.
+        // Approximation (filled for inertia calc, hollow for particles)
         // Inertia of box:
-        const totalMass = Math.pow(N, 3) * particleMass; // Approximation (filled)
-        // If hollow, mass is less.
-        // calculateBoxInertia expects total mass.
-        // We will construct it hollow or filled?
-        // User asked for "1, 8, 27". 1=1x1x1. 8=2x2x2. 27=3x3x3.
-        // These are filled.
-        
         const particles = [];
         const offset = (N - 1) * r;
         for(let i=0; i<N; i++) {
@@ -185,8 +175,18 @@ async function main() {
         
         const bodyId = w.addBody(x, y, z, axis.x*s, axis.y*s, axis.z*s, qw, mass, inertia.x, inertia.y, inertia.z);
         
-        for(let p of particles) {
-            w.addParticle(bodyId, p[0], p[1], p[2]);
+        // Add particles (hollow optimization)
+        for(let i=0; i<N; i++) {
+            for(let j=0; j<N; j++) {
+                for(let k=0; k<N; k++) {
+                    if(i===0 || i===N-1 || j===0 || j===N-1 || k===0 || k===N-1) {
+                        const lx = i * 2 * r - offset;
+                        const ly = j * 2 * r - offset;
+                        const lz = k * 2 * r - offset;
+                        w.addParticle(bodyId, lx, ly, lz);
+                    }
+                }
+            }
         }
         
         addRange('Box', bodyStart, 1);
@@ -195,34 +195,26 @@ async function main() {
     // 2. Cylinder Generator
     function addCompoundCylinder(x, y, z) {
         const bodyStart = w.bodyCount;
-        // Cylinder height = size. Diameter = size.
-        // Approximation: fill grid, keep if inside radius.
         const size = N * 2 * r;
         const radius = size / 2;
-        const height = size; // aspect 1:1
         
         const particles = [];
-        const offset = (N - 1) * r; // Centering offset for grid
+        const offset = (N - 1) * r; 
         
-        // We iterate grid NxNxN and carve cylinder
         for(let i=0; i<N; i++) {
-            for(let j=0; j<N; j++) { // Y axis
+            for(let j=0; j<N; j++) {
                 for(let k=0; k<N; k++) {
                     const lx = i * 2 * r - offset;
                     const ly = j * 2 * r - offset;
                     const lz = k * 2 * r - offset;
-                    
-                    // Check radius in XZ plane
-                    // Cylinder radius is roughly offset + r? 
-                    // Let's use `radius` derived from size.
-                    if (lx*lx + lz*lz <= radius*radius * 1.2) { // Allow slightly rough
+                    if (lx*lx + lz*lz <= radius*radius * 1.2) {
                         particles.push([lx, ly, lz]);
                     }
                 }
             }
         }
         
-        if (particles.length === 0) return; // Should not happen
+        if (particles.length === 0) return;
 
         const mass = particles.length * particleMass;
         const inertia = calculateCloudInertia(mass, particles);
@@ -242,20 +234,17 @@ async function main() {
     // 3. Tetris Generator
     function addCompoundTetris(x, y, z, type) {
         const bodyStart = w.bodyCount;
-        const offsets = getTetrisBlocks(type); // Array of 4 centers [x,y,z] (units)
-        // Unit is "one block". One block corresponds to NxNxN particles.
-        // Block size = N * 2r.
+        const offsets = getTetrisBlocks(type);
         const blockSize = N * 2 * r;
         
         const particles = [];
-        // For each block in tetris shape
+        const internalOffset = (N - 1) * r;
+
         for(let off of offsets) {
             const bx = off[0] * blockSize;
             const by = off[1] * blockSize;
             const bz = off[2] * blockSize;
             
-            // Fill block with particles
-            const internalOffset = (N - 1) * r;
             for(let i=0; i<N; i++) {
                 for(let j=0; j<N; j++) {
                     for(let k=0; k<N; k++) {
@@ -268,14 +257,12 @@ async function main() {
             }
         }
         
-        // Calculate COM of particles
         let cx=0, cy=0, cz=0;
         for(let p of particles) { cx+=p[0]; cy+=p[1]; cz+=p[2]; }
         cx /= particles.length;
         cy /= particles.length;
         cz /= particles.length;
         
-        // Recenter particles
         for(let p of particles) { p[0]-=cx; p[1]-=cy; p[2]-=cz; }
         
         const mass = particles.length * particleMass;
@@ -297,12 +284,17 @@ async function main() {
     const tetrisTypes = getTetrisTypes();
     const count = params.objectCount;
     const shape = params.spawnShape;
-    const spacing = (N * 2 * w.radius) * 4; 
+    const vSpacing = (N * 2 * r) * 3.0;
+    const spawnDiameter = 12 * 0.5;
 
     for(let i=0; i<count; i++) {
-        const px = (Math.random() - 0.5) * 8;
-        const pz = (Math.random() - 0.5) * 8;
-        const py = 2 + i * 1.0; // Stack them up
+        // Spawn in a circle/column
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * (spawnDiameter / 2);
+        const px = Math.cos(angle) * dist;
+        const pz = Math.sin(angle) * dist;
+        // Quadruple the density (4 objects per vertical slot on average)
+        const py = 2 + i * (vSpacing * 0.25); 
 
         let type = shape;
         if (type === 'Mix') {
@@ -337,7 +329,7 @@ async function main() {
   folderPhys.add(world, "fixedTimeStep", 0.001, 0.1, 0.001).name("Time Step");
   folderPhys.add(params, "gravityY", -20, 20, 0.1).name("Gravity Y").onChange(v => world.gravity = new Vec3(0, v, 0));
   
-  gui.add(params, "sphereRadius", 0.1, 2, 0.05).onChange((v) => world.setSphereRadius(0, v));
+  gui.add(params, "sphereRadius", 0.1, 10, 0.05).onChange((v) => world.setSphereRadius(0, v));
   gui.add(params, "oscillate");
   gui.add(params, "showParticles").name("Render Particles");
   gui.add(params, "paused");
@@ -367,9 +359,10 @@ async function main() {
 
     if (params.oscillate) {
       const t = now * 0.001;
-      const sx = Math.sin(t * 0.5) * 2.5;
-      const sz = Math.cos(t * 0.35) * 2.5;
-      const sy = 0.8 + Math.sin(t * 0.9) * 0.6;
+      // Increased rate (4x) and amplitude
+      const sx = Math.sin(t * 2.0) * 2.5; 
+      const sz = Math.cos(t * 1.4) * 2.5; 
+      const sy = 0.8 + Math.sin(t * 3.6) * 2.0; 
       world.setSpherePosition(0, sx, sy, sz);
     }
 
@@ -381,45 +374,8 @@ async function main() {
     const context = canvas.getContext("webgpu");
     const viewProj = orbit.getViewProj(canvas.width / canvas.height);
     
-    // Update all renderers
-    // Scale for rendering:
-    // Box: size = N * 2r. Scale = size. (Since geometry is unit cube size 1... wait, geometry is -1..1 size 2. ShapeRenderer scales by uniforms.scale * 0.5. So if we pass size, it renders size.)
-    // Cylinder: Geometry is -1..1 (height 2, diameter 2). Scale by 0.5 inside shader?
-    // ShapeRenderer code: `localPos * uniforms.scale`.
-    // It does NOT multiply by 0.5 in shader unless I put it there.
-    // In BoxRenderer it did: `localPos * uniforms.scale * 0.5`.
-    // In ShapeRenderer I copied it. `localPos * uniforms.scale`.
-    // Wait, let's check ShapeRenderer.js content I wrote.
-    // `let scaledPos = localPos * uniforms.scale;`
-    // No 0.5 factor?
-    // Box geometry is -1..1. If I pass scale=1, size is 2.
-    // If I want size S, I need scale S/2? No.
-    // If I pass scale 1, result is -1..1.
-    // If I want result to be -S/2 .. S/2 (size S).
-    // I need scale S/2? No.
-    // I need `localPos * 0.5 * S`.
-    // So scale should be `S * 0.5`.
-    
-    // But wait, `BoxRenderer.js` previously had `localPos * 0.5` hardcoded.
-    // And I updated it to `localPos * uniforms.scale * 0.5`.
-    // `ShapeRenderer.js`: I wrote `let scaledPos = localPos * uniforms.scale;`.
-    // I did NOT put 0.5.
-    // So `ShapeRenderer` draws size 2 * scale.
-    // So if I want size S, I should pass `scale = S / 2`.
-    
-    // Box size: `N * 2 * r`.
-    // Scale = `N * r`.
     const scaleBox = params.resolution * world.radius;
-    // Cylinder size: diameter `N * 2 * r`. Height `N * 2 * r`.
-    // Scale = `N * r`.
     const scaleCyl = params.resolution * world.radius;
-    // Tetris: Unit block size `N * 2 * r`.
-    // Geometry is built from 1x1x1 cubes?
-    // `createTetrisGeometry`: `bx = baseBox * 0.5`. So cubes are 1x1x1.
-    // Then merged.
-    // If I scale by S, cubes become SxSxS.
-    // I want cubes to be size `N * 2 * r`.
-    // So scale = `N * 2 * r`.
     const scaleTetris = params.resolution * 2 * world.radius;
 
     // Update bindings
@@ -440,20 +396,9 @@ async function main() {
     for(let key in shapeRenderers) {
         shapeRenderers[key].updateBindGroup(world.getBodyPositionBuffer(), world.getBodyQuaternionBuffer());
         let s = [1,1,1];
-        if (key === 'Box') s = [scaleBox, scaleBox, scaleBox]; // Box geometry is -1..1. Scale=scaleBox -> Size 2*scaleBox. Wait.
-        // Box geometry (-1..1). Size 2.
-        // I want size `2 * N * r`.
-        // Scale = `(2 * N * r) / 2` = `N * r`.
-        // Yes `scaleBox` is correct.
-        
-        else if (key === 'Cylinder') s = [scaleCyl, scaleCyl, scaleCyl]; // Same logic.
-        
-        else if (key.startsWith('Tetris')) {
-            // Tetris geometry is built of 1x1x1 cubes.
-            // I want cubes of size `2 * N * r`.
-            // So scale = `2 * N * r`.
-            s = [scaleTetris, scaleTetris, scaleTetris];
-        }
+        if (key === 'Box') s = [scaleBox, scaleBox, scaleBox];
+        else if (key === 'Cylinder') s = [scaleCyl, scaleCyl, scaleCyl];
+        else if (key.startsWith('Tetris')) s = [scaleTetris, scaleTetris, scaleTetris];
         
         shapeRenderers[key].updateUniforms(viewProj, s);
     }
@@ -477,7 +422,6 @@ async function main() {
     if (params.showParticles) {
       particleRenderer.record(pass, world.particleCount);
     } else {
-      // Render shapes by iterating ranges
       for (let type in bodyRanges) {
         const ranges = bodyRanges[type];
         const renderer = shapeRenderers[type];
@@ -490,11 +434,7 @@ async function main() {
       }
     }
     
-    // Render interaction sphere (always visible?) or only if shadows?
-    // User said "interactive sphere ... is not visible".
-    // I'll render it always.
     sphereRenderer.record(pass, 1);
-
     gridRenderer.record(pass);
     pass.end();
     device.queue.submit([encoder.finish()]);
