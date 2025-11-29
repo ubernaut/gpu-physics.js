@@ -23,23 +23,23 @@ async function main() {
     damping: 5,
     friction: 1.5,
     drag: 0.25,
-    gravityY: -2,
+    gravityY: -10,
     sphereRadius: 6,
     oscillate: true,
-    ampX: 2.5,
-    ampY: 2.0,
-    ampZ: 2.5,
+    ampX: 5,
+    ampY: 5,
+    ampZ: 5,
     showParticles: false, // Default off
     paused: false,
     
     // Generator params
-    objectCount: 256, // Increased default
-    resolution: 2, // Default 2
+    objectCount: 1024, // Increased default
+    resolution: 1, // Default 1
     spawnShape: 'Mix', // Box, Cylinder, Sphere, Tetris, Mix
 
     // Container params
     boxX: 12,
-    boxY: 48,
+    boxY: 100,
     boxZ: 12,
   };
 
@@ -80,8 +80,8 @@ async function main() {
     
     // Create new world locally
     const newWorld = new World({
-      maxBodies: 16384, // Increased limit
-      maxParticles: 131072, // Increased limit (128k)
+      maxBodies: 100000, // Increased limit
+      maxParticles: 1000000, // Increased limit (128k)
       radius: r,
       stiffness: params.stiffness,
       damping: params.damping,
@@ -326,8 +326,8 @@ async function main() {
     const tetrisTypes = getTetrisTypes();
     const count = params.objectCount;
     const shape = params.spawnShape;
-    const vSpacing = (N * 2 * r) * 3.0;
-    const spawnDiameter = 12 * 0.5;
+    const vSpacing = (N * 2 * r) * 1.0;
+    const spawnDiameter = 12 * 1;
 
     for(let i=0; i<count; i++) {
         // Spawn in a circle/column
@@ -362,7 +362,7 @@ async function main() {
   await initWorld();
 
   const gui = new window.lil.GUI({ title: "Shapes Demo" });
-  gui.add(params, "objectCount", 1, 10000, 1).name("Object Count").onFinishChange(initWorld);
+  gui.add(params, "objectCount", 1, 50000, 1024).name("Object Count").onFinishChange(initWorld);
   gui.add(params, "resolution", 1, 4, 1).name("Particles/Side").onFinishChange(initWorld);
   gui.add(params, "spawnShape", ['Box', 'Cylinder', 'Sphere', 'Tetris', 'Mix']).name("Shape").onFinishChange(initWorld);
   
